@@ -5,9 +5,10 @@ import { SearchResult } from '../types';
 interface ResultDisplayProps {
   result: SearchResult;
   query: string;
+  radius: number;
 }
 
-const ResultDisplay: React.FC<ResultDisplayProps> = ({ result, query }) => {
+const ResultDisplay: React.FC<ResultDisplayProps> = ({ result, query, radius }) => {
   const formatText = (text: string) => {
     return text.split('\n').map((line, i) => {
       let processedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong class="text-blue-400 font-bold">$1</strong>');
@@ -57,7 +58,10 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ result, query }) => {
           </div>
           <div>
             <h2 className="text-4xl font-black text-white tracking-tighter uppercase">Estrategia Digital</h2>
-            <p className="text-slate-500 font-bold text-lg">Ventajas competitivas y oportunidades para "{query}"</p>
+            <div className="flex flex-wrap items-center gap-2 mt-1">
+              <p className="text-slate-500 font-bold text-lg">Resultados para "{query}"</p>
+              <span className="px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-400 text-xs font-black uppercase tracking-tighter">Radio: {radius}km</span>
+            </div>
           </div>
         </div>
 

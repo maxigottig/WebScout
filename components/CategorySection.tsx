@@ -10,7 +10,7 @@ const CATEGORIES = [
   { label: 'Peluquerías', icon: 'fa-scissors' }
 ];
 
-interface Props { onCategorySelect: (query: string) => void; }
+interface Props { onCategorySelect: (query: string, useLocation: boolean, radius: number) => void; }
 
 const CategorySection: React.FC<Props> = ({ onCategorySelect }) => {
   return (
@@ -20,7 +20,7 @@ const CategorySection: React.FC<Props> = ({ onCategorySelect }) => {
         {CATEGORIES.map((cat) => (
           <button
             key={cat.label}
-            onClick={() => onCategorySelect(cat.label)}
+            onClick={() => onCategorySelect(cat.label, true, 5)}
             className="glass px-6 py-4 rounded-2xl flex items-center gap-3 hover:bg-blue-600 hover:text-white transition-all hover:-translate-y-1 font-bold group"
           >
             <i className={`fa-solid ${cat.icon} group-hover:scale-125 transition-transform`}></i>

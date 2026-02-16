@@ -3,16 +3,15 @@ import { GoogleGenAI, Chat } from "@google/genai";
 import { Location, SearchResult } from "../types";
 
 // Helper to initialize GoogleGenAI with the current API key.
-// It's best practice to create a new instance before calls to ensure the latest key is used.
 const getAi = () => new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
 /**
  * Searches for local businesses using Google Maps grounding.
- * Note: Maps grounding is only supported in Gemini 2.5 series models.
  */
 export const searchBusinessesWithoutWebsites = async (
   query: string,
-  location?: Location
+  location?: Location,
+  radius: number = 5
 ): Promise<SearchResult> => {
   const ai = getAi();
   const systemInstruction = `
@@ -22,16 +21,15 @@ export const searchBusinessesWithoutWebsites = async (
     Para cada búsqueda:
     1. Clasifica los negocios en "OPORTUNIDADES (Sin Sitio Web)" y "PRESENCIA DIGITAL (Con Sitio Web)".
     2. Para los negocios SIN sitio web, explica detalladamente las VENTAJAS de digitalizarse (ej. mayor visibilidad, ventas 24/7, credibilidad, SEO local).
-    3. No te enfoques en dar coordenadas o direcciones exactas en el texto del reporte, céntrate en el valor del sitio web.
-    4. Asegúrate de que el modelo use la herramienta de Google Maps para identificar los negocios y proporcionar los enlaces correspondientes.
+    3. Céntrate estrictamente en el radio de búsqueda especificado (${radius} km).
+    4. No te enfoques en dar coordenadas o direcciones exactas en el texto del reporte, céntrate en el valor del sitio web.
+    5. Asegúrate de que el modelo use la herramienta de Google Maps para identificar los negocios y proporcionar los enlaces correspondientes.
   `;
 
   try {
     const response = await ai.models.generateContent({
-      // Maps grounding is only supported in Gemini 2.5 series models.
-      // Correcting model name from gemini-2.5-flash-lite-latest to gemini-2.5-flash
       model: "gemini-2.5-flash",
-      contents: `Analiza comercios de tipo "${query}" cerca de ${location ? `${location.latitude}, ${location.longitude}` : "mi ubicación"}. Identifica su estado web y ventajas de mejora.`,
+      contents: `Analiza comercios de tipo "${query}" en un radio estricto de ${radius} km cerca de ${location ? `${location.latitude}, ${location.longitude}` : "mi ubicación"}. Identifica su estado web y ventajas de mejora.`,
       config: {
         tools: [{ googleMaps: {} }],
         toolConfig: {
@@ -67,7 +65,6 @@ export const generateIllustrativeImage = async (query: string): Promise<string |
       config: { imageConfig: { aspectRatio: "16:9" } }
     });
 
-    // Find the image part in the response
     for (const part of response.candidates[0].content.parts) {
       if (part.inlineData) {
         return `data:image/png;base64,${part.inlineData.data}`;

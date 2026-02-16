@@ -2,18 +2,20 @@
 import React, { useState } from 'react';
 
 interface SearchInputProps {
-  onSearch: (query: string, useLocation: boolean) => void;
+  onSearch: (query: string, useLocation: boolean, radius: number) => void;
   isLoading: boolean;
+  radius: number;
+  setRadius: (r: number) => void;
 }
 
-const SearchInput: React.FC<SearchInputProps> = ({ onSearch, isLoading }) => {
+const SearchInput: React.FC<SearchInputProps> = ({ onSearch, isLoading, radius, setRadius }) => {
   const [query, setQuery] = useState('');
   const [useLocation, setUseLocation] = useState(true);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
-      onSearch(query, useLocation);
+      onSearch(query, useLocation, radius);
     }
   };
 
@@ -47,7 +49,8 @@ const SearchInput: React.FC<SearchInputProps> = ({ onSearch, isLoading }) => {
           </button>
         </div>
       </div>
-      <div className="flex items-center justify-center gap-6 text-sm">
+
+      <div className="flex flex-col md:flex-row items-center justify-center gap-8 glass p-6 rounded-2xl border-white/5 shadow-inner">
         <label className="flex items-center cursor-pointer group select-none">
           <div className="relative flex items-center justify-center">
             <input
@@ -58,8 +61,23 @@ const SearchInput: React.FC<SearchInputProps> = ({ onSearch, isLoading }) => {
             />
             <i className="fa-solid fa-check absolute text-[10px] text-white opacity-0 peer-checked:opacity-100 transition-opacity"></i>
           </div>
-          <span className="ml-3 text-slate-400 group-hover:text-slate-200 transition-colors">Usar mi ubicación actual</span>
+          <span className="ml-3 text-slate-400 group-hover:text-slate-200 transition-colors text-sm font-medium">Ubicación actual</span>
         </label>
+
+        <div className="flex flex-col w-full md:w-64 space-y-2">
+          <div className="flex justify-between items-center text-xs font-black uppercase tracking-widest text-slate-500">
+            <span>Radio de búsqueda</span>
+            <span className="text-blue-500 font-bold">{radius} km</span>
+          </div>
+          <input
+            type="range"
+            min="1"
+            max="50"
+            value={radius}
+            onChange={(e) => setRadius(parseInt(e.target.value))}
+            className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-blue-600"
+          />
+        </div>
       </div>
     </form>
   );

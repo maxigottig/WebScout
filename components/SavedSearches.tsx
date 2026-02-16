@@ -1,7 +1,7 @@
 
 import React from 'react';
 
-interface Props { queries: string[]; onSelect: (q: string) => void; }
+interface Props { queries: string[]; onSelect: (q: string, useLocation: boolean, radius: number) => void; }
 
 const SavedSearches: React.FC<Props> = ({ queries, onSelect }) => {
   if (queries.length === 0) return null;
@@ -16,7 +16,7 @@ const SavedSearches: React.FC<Props> = ({ queries, onSelect }) => {
         {queries.map((q, i) => (
           <button
             key={i}
-            onClick={() => onSelect(q)}
+            onClick={() => onSelect(q, true, 5)}
             className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-sm font-medium hover:bg-white/10 transition-colors"
           >
             {q}

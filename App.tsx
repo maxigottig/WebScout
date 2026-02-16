@@ -5,6 +5,7 @@ import ResultDisplay from './components/ResultDisplay';
 import CategorySection from './components/CategorySection';
 import SavedSearches from './components/SavedSearches';
 import WhatsAppBubble from './components/WhatsAppBubble';
+import AiChat from './components/AiChat';
 import { searchBusinessesWithoutWebsites, generateIllustrativeImage } from './services/geminiService';
 import { AppState, Location } from './types';
 
@@ -14,6 +15,7 @@ const App: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [savedQueries, setSavedQueries] = useState<string[]>([]);
   const [heroImage, setHeroImage] = useState<string | null>(null);
+  const [radius, setRadius] = useState(5);
 
   useEffect(() => {
     const saved = localStorage.getItem('scout_saved_searches');
@@ -31,7 +33,7 @@ const App: React.FC = () => {
     setLastQuery('');
   };
 
-  const handleSearch = async (query: string, useLocation: boolean) => {
+  const handleSearch = async (query: string, useLocation: boolean, searchRadius: number) => {
     setState({ ...state, loading: true, error: null });
     setLastQuery(query);
     setHeroImage(null);
@@ -55,7 +57,7 @@ const App: React.FC = () => {
 
     try {
       const [data, img] = await Promise.all([
-        searchBusinessesWithoutWebsites(query, location),
+        searchBusinessesWithoutWebsites(query, location, searchRadius),
         generateIllustrativeImage(query)
       ]);
       setHeroImage(img);
@@ -91,13 +93,18 @@ const App: React.FC = () => {
 
       <main className="max-w-7xl mx-auto space-y-12">
         <div className="sticky top-6 z-40">
-          <SearchInput onSearch={handleSearch} isLoading={state.loading} />
+          <SearchInput 
+            onSearch={handleSearch} 
+            isLoading={state.loading} 
+            radius={radius} 
+            setRadius={setRadius} 
+          />
         </div>
 
         {!state.results && !state.loading && (
           <div className="space-y-12 animate-in fade-in duration-1000">
-            <CategorySection onCategorySelect={(q) => handleSearch(q, true)} />
-            <SavedSearches queries={savedQueries} onSelect={(q) => handleSearch(q, true)} />
+            <CategorySection onCategorySelect={(q) => handleSearch(q, true, radius)} />
+            <SavedSearches queries={savedQueries} onSelect={(q) => handleSearch(q, true, radius)} />
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-12">
                {[
@@ -141,12 +148,13 @@ const App: React.FC = () => {
                 </div>
               </div>
             )}
-            <ResultDisplay result={state.results} query={lastQuery} />
+            <ResultDisplay result={state.results} query={lastQuery} radius={radius} />
           </div>
         )}
       </main>
 
       <WhatsAppBubble />
+      <AiChat />
     </div>
   );
 };
