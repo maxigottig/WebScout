@@ -1,0 +1,7 @@
+{
+  "name": "WebScout",
+  "description": "Find local businesses that lack an online presence. This app uses Google Maps grounding to identify shops and commerce without listed websites, helping you discover hidden gems or potential digital marketing opportunities.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
